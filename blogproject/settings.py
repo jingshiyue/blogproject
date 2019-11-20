@@ -25,7 +25,7 @@ SECRET_KEY = 'u653xns@01jrq4#v(3d$!ijawqd5)m#ab9pr&i&r2yspg$g0!+'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost ']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost ',]
 
 
 # Application definition
@@ -36,7 +36,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
+    'django.contrib.staticfiles', #内置app，查找静态文件，staticfiles使开发者可以将静态文件分配到app目录或任意指定目录。
     'blog',
     'comments',
 ]
@@ -66,7 +66,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
             ],
             'libraries': {
-                'blog_tags': 'blog.templatetags.blog_tags',
+                'blog_tags': 'blog.templatetags.blog_tags', #注册自定义的模板标签
             }
         },
     },
@@ -131,5 +131,5 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
-STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_URL = '/static/'  #模板渲染时 url静态文件路径的前缀,注意前缀家的是相对路径
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')   #通过manage.py collectstatic命令汇集到settings.STATIC_ROOT目录
