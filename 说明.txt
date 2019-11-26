@@ -1,1 +1,2 @@
 教程地址：https://www.zmrenwu.com/courses/django-blog-tutorial/materials/27/
+基于Django 1.10 和 Python 3.5
