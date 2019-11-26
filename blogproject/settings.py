@@ -25,10 +25,11 @@ SECRET_KEY = 'u653xns@01jrq4#v(3d$!ijawqd5)m#ab9pr&i&r2yspg$g0!+'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost ',]
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost',]
 
 
 # Application definition
+
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -39,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles', #内置app，查找静态文件，staticfiles使开发者可以将静态文件分配到app目录或任意指定目录。
     'blog',
     'comments',
+    'haystack',
 ]
 
 MIDDLEWARE = [
@@ -131,5 +133,13 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
-STATIC_URL = '/static/'  #模板渲染时 url静态文件路径的前缀,注意前缀家的是相对路径
+STATIC_URL = '/collectstatic/'  #模板渲染时 url静态文件路径的前缀,注意前缀加的是相对路径
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')   #通过manage.py collectstatic命令汇集到settings.STATIC_ROOT目录
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        'ENGINE': 'blog.whoosh_cn_backends.WhooshEngine',
+        'PATH': os.path.join(BASE_DIR, 'whoosh_index'),
+    },
+}
+HAYSTACK_SEARCH_RESULTS_PER_PAGE = 5
+HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
