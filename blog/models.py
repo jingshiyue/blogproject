@@ -1,5 +1,6 @@
 from django.db import models
-from django.contrib.auth.models import User
+# from django.contrib.auth.models import User
+from login.models import Userprofile
 from django.urls import reverse
 import markdown
 from django.utils.six import python_2_unicode_compatible
@@ -42,7 +43,7 @@ class Post(models.Model):
 
     # 文章摘要，可以没有文章摘要，但默认情况下 CharField 要求我们必须存入数据，否则就会报错。
     # 指定 CharField 的 blank=True 参数值后就可以允许空值了。
-    excerpt = models.CharField(max_length=200, blank=True)
+    excerpt = models.CharField(max_length=200, blank=True)   #调用save方法会增加该字段内容
 
     # 我们规定一篇文章只能对应一个分类，但是一个分类下可以有多篇文章，所以我们使用的是 ForeignKey，即一对多的关联关系。
     # 而对于标签来说，一篇文章可以有多个标签，同一个标签下也可能有多篇文章，所以我们使用 ManyToManyField，表明这是多对多的关联关系。
@@ -51,10 +52,10 @@ class Post(models.Model):
     # https://docs.djangoproject.com/en/1.10/topics/db/models/#relationships
     category = models.ForeignKey(Category,on_delete=models.CASCADE)
     tags = models.ManyToManyField(Tag, blank=True)
-    author = models.ForeignKey(User,on_delete=models.CASCADE)
+    author = models.ForeignKey(Userprofile,on_delete=models.CASCADE)
     views = models.PositiveIntegerField(default=0)
 
-    def get_absolute_url(self):
+    def get_absolute_url(self):  #模板标签里通过{{ post.get_absolute_url }}，访问该函数
         return reverse('blog:detail', kwargs={'pk': self.pk})
 
     def increase_views(self):

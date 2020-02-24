@@ -17,11 +17,16 @@ from django.conf.urls import url
 from django.contrib import admin
 from django.conf.urls import url, include
 from blog.feeds import AllPostsRssFeed
+from . import views
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'', include('blog.urls')),
-    url(r'', include('comments.urls')),
-    url(r'^all/rss/$', AllPostsRssFeed(), name='rss'),
+    url(r'^blog/', include('blog.urls')),
+    url(r'^comments', include('comments.urls')),
+    url(r'^login/', include('login.urls')),
+    url(r'^all/rss/$', AllPostsRssFeed(), name='rss'),   
     url(r'^search/', include('haystack.urls')),  #搜索的视图函数和 URL 模式 django haystack 都已经帮我们写好了，只需要项目的 urls.py 中包含它：
+    url(r'^about/',views.about,name='about'),
+    url(r'^contact/',views.contact,name='contact'),
 ]
+
 

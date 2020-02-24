@@ -25,7 +25,7 @@ SECRET_KEY = 'u653xns@01jrq4#v(3d$!ijawqd5)m#ab9pr&i&r2yspg$g0!+'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost',]
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -33,7 +33,7 @@ ALLOWED_HOSTS = ['127.0.0.1', 'localhost',]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
-    'django.contrib.auth',
+    'django.contrib.auth',  #自带的认证
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
@@ -41,13 +41,15 @@ INSTALLED_APPS = [
     'blog',
     'comments',
     'haystack',
+    'login',
+    'captcha',  #图片验证码
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -133,13 +135,23 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
-STATIC_URL = '/collectstatic/'  #模板渲染时 url静态文件路径的前缀,注意前缀加的是相对路径
+STATIC_URL = '/static/'  #模板渲染时 url静态文件路径的前缀,注意前缀加的是相对路径
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')   #通过manage.py collectstatic命令汇集到settings.STATIC_ROOT目录
 HAYSTACK_CONNECTIONS = {
     'default': {
         'ENGINE': 'blog.whoosh_cn_backends.WhooshEngine',
-        'PATH': os.path.join(BASE_DIR, 'whoosh_index'),
+        'PATH': os.path.join(BASE_DIR, 'whoosh_index'),  #Whoosh 索引文件的存放文件夹
     },
 }
-HAYSTACK_SEARCH_RESULTS_PER_PAGE = 5
-HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
+HAYSTACK_SEARCH_RESULTS_PER_PAGE = 5   #搜索结果每页展示数据
+HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'  #
+CONFIRM_DAYS = 7
+
+AUTHENTICATION_BACKENDS = (           #自定义认证方式
+    'login.auth.MyCustomBackend',
+    # 'social_core.backends.weibo.WeiboOAuth2',
+    # 'social_core.backends.qq.QQOAuth2',
+    # 'social_core.backends.weixin.WeixinOAuth2',
+    # 'django.contrib.auth.backends.ModelBackend',
+)
+AUTH_USER_MODEL = 'login.Userprofile'

@@ -4,11 +4,12 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
 from comments.forms import CommentForm
 import markdown
-from .models import Post
+from .models import Post,Tag,Category
 from django.views.generic import ListView,DetailView
 from django.utils.text import slugify
 from markdown.extensions.toc import TocExtension
 from django.db.models import Q
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 # def index(request):
 #     post_list = Post.objects.all().order_by('-created_time')
@@ -25,31 +26,6 @@ def search(request):
     post_list = Post.objects.filter(Q(title__icontains=q) | Q(body__icontains=q))
     return render(request, 'blog/index.html', {'error_msg': error_msg,
                                                'post_list': post_list})
-
-class IndexView(ListView):
-    model = Post
-    template_name = 'blog/index.html'
-    context_object_name = 'post_list'
-
-# def detail(request, pk):
-#     post = get_object_or_404(Post, pk=pk)
-#     post.body = markdown.markdown(post.body,
-#                                   extensions=[
-#                                       'markdown.extensions.extra',
-#                                       'markdown.extensions.codehilite',
-#                                       'markdown.extensions.toc',
-#                                   ])
-#     # 记得在顶部导入 CommentForm
-#     form = CommentForm()
-#     # 获取这篇 post 下的全部评论
-#     comment_list = post.comment_set.all()  #帅选出comment
-#     post.increase_views()
-#     # 将文章、表单、以及文章下的评论列表作为模板变量传给 detail.html 模板，以便渲染相应数据。
-#     context = {'post': post,
-#                'form': form,
-#                'comment_list': comment_list
-#                }
-#     return render(request, 'blog/detail.html', context=context)
 
 class PostDetailView(DetailView):
     # 这些属性的含义和 ListView 是一样的
@@ -88,11 +64,10 @@ class PostDetailView(DetailView):
         md = markdown.Markdown(extensions=[
             'markdown.extensions.extra',
             'markdown.extensions.codehilite',
-            # 'markdown.extensions.toc',
             TocExtension(slugify=slugify),
         ])
         post.body = md.convert(post.body)
-        post.toc = md.toc
+        post.toc = md.toc  #post动态添加toc字段
         return post
 
     def get_context_data(self, **kwargs):
@@ -101,9 +76,11 @@ class PostDetailView(DetailView):
         context = super(PostDetailView, self).get_context_data(**kwargs)
         form = CommentForm()
         comment_list = self.object.comment_set.all()
+        conment_count = len(comment_list)
         context.update({
             'form': form,
-            'comment_list': comment_list
+            'comment_list': comment_list,
+            'conment_count':conment_count
         })
         return context
 
@@ -120,16 +97,12 @@ def archives(request, year, month):
 #     post_list = Post.objects.filter(category=cate).order_by('-created_time')
 #     return render(request, 'blog/index.html', context={'post_list': post_list})
 
-class CategoryView(IndexView):
-    def get_queryset(self):
-        cate = get_object_or_404(Category, pk=self.kwargs.get('pk'))
-        return super(CategoryView, self).get_queryset().filter(category=cate)
-
-class IndexView(ListView):
+class IndexView(LoginRequiredMixin,ListView):
+# class IndexView(ListView):
     model = Post
     template_name = 'blog/index.html'
     context_object_name = 'post_list'
-    paginate_by = 1
+    paginate_by = 2
 
     def get_context_data(self, **kwargs):
         """
@@ -156,10 +129,9 @@ class IndexView(ListView):
 
         # 调用自己写的 pagination_data 方法获得显示分页导航条需要的数据，见下方。
         pagination_data = self.pagination_data(paginator, page, is_paginated)
-
+        
         # 将分页导航条的模板变量更新到 context 中，注意 pagination_data 方法返回的也是一个字典。
-        context.update(pagination_data)
-
+        context.update(pagination_data)   
         # 将更新后的 context 返回，以便 ListView 使用这个字典中的模板变量去渲染模板。
         # 注意此时 context 字典中已有了显示分页导航条所需的数据。
         return context
@@ -261,4 +233,28 @@ class IndexView(ListView):
         }
 
         return data
+
+class CategoryView(IndexView):
+    def get_queryset(self):
+        cate = get_object_or_404(Category, pk=self.kwargs.get('pk'))
+        return super(CategoryView, self).get_queryset().filter(category=cate)
+
+class TagView(ListView):
+    model = Post
+    template_name = 'blog/index.html'
+    context_object_name = 'post_list'
+ 
+    def get_queryset(self):
+        tag = get_object_or_404(Tag, pk=self.kwargs.get('pk'))
+        return super(TagView, self).get_queryset().filter(tags=tag)
+
+
+from django.shortcuts import render
+
+
+def about(request):
+    render (request,'about.html')
+
+def contact(request):
+    render (request,'contact.html')
 
