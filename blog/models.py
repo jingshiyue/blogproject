@@ -50,7 +50,7 @@ class Post(models.Model):
     # 同时我们规定文章可以没有标签，因此为标签 tags 指定了 blank=True。
     # 如果你对 ForeignKey、ManyToManyField 不了解，请看教程中的解释，亦可参考官方文档：
     # https://docs.djangoproject.com/en/1.10/topics/db/models/#relationships
-    category = models.ForeignKey(Category,on_delete=models.CASCADE)
+    category = models.ForeignKey(Category,related_name='related_name',on_delete=models.CASCADE)
     tags = models.ManyToManyField(Tag, blank=True)
     author = models.ForeignKey(Userprofile,on_delete=models.CASCADE)
     views = models.PositiveIntegerField(default=0)
